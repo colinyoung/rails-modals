@@ -22,11 +22,11 @@ Then add the following requires to your `application.js` and `application.css` f
 
 Change all your links that you want to link to a modal to the following:
 
-    link_to ... => link_to_modal
+    link_to ... => link_to_modal ...
 
 That's it! Provided your linked-to pages have forms on them, your forms will populate inside a modal.
 
-Incidentally, the title of the modal window is the same as the <title> of your linked-to page.
+Incidentally, the title of the modal window is the same as the `<title>` of your linked-to page.
 
 ## Optimizing your controllers
 
@@ -60,7 +60,7 @@ class MyController < ApplicationController
 end
 ```
 
-The format of this case is expected to be a non-`200` error code, and have an `error` key on a root object as shown. If you follow those simple rules, your error message will display in a modal automatically.
+The response in this case is expected to be a non-`200` error code, and have an `error` key on a root object as shown. If you follow those simple rules, your error message will display in a modal automatically.
 
 
 ## Steps
@@ -69,17 +69,17 @@ Sometimes you want to divide a form into steps, like in a wizard.
 
 This is easy: just do the following in your form:
 
-    <form action="..." method="POST">
-      <fieldset data-modal-step>
-        <label>Fields on page 1 of wizard</label>
-      </fieldset>
+```html
+<form action="..." method="POST">
+  <fieldset data-modal-step>
+    <label>Fields on page 1 of wizard</label>
+  </fieldset>
 
-      <fieldset data-modal-step>
-        <label>Fields on page 2 of wizard</label>
-      </fieldset>
-    </form>
-
-
+  <fieldset data-modal-step>
+    <label>Fields on page 2 of wizard</label>
+  </fieldset>
+</form>
+```
 
 ## Contributing
 
