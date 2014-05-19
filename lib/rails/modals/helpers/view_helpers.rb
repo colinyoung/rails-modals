@@ -41,12 +41,15 @@ module Rails::Modals
           raw <<-RAW
             <div class="bbm-modal__topbar">
               <h3 class="bbm-modal__title"><%= title %></h3>
+              <a href="#" class="bbm-close" style="display: none">&times; Close</a>              
             </div>
             <div class="bbm-modal__section">
               <%= content %>
             </div>
             <div class="bbm-modal__bottombar">
-              <a href="#" class="bbm-button">Close</a>
+              <a href="#" class="bbm-button close">Close</a>
+              <a href="#" class="bbm-button previous inactive" style="display: none">Previous</a>
+              <a href="#" class="bbm-button next" style="display: none">Next</a>
             </div>
           RAW
         end

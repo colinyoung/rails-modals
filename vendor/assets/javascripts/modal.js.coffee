@@ -55,13 +55,22 @@ $.fn.modal = (action) ->
       script = $("script[type='text/template'][data-path='#{path}']")
 
       html = $(script).html()
+      views = {}
+      steps = $(html).find('*[data-modal-step]')
 
-      modalOptions = if $(html).find('*[modal-step]').length
+      $(steps).each (i, step) ->
+        key = "#step" + i
+        views[key] = { view: '<div class="bbm-modal__topbar">step' + i + '</div>' }
+
+      modalOptions = if steps.length > 0
         # split steps into views
-        # -- pending
-        {}
+        {
+          cancelEl: '.bbm-cancel'
+          submitEl: '.done'
+          views: views
+        }
       else
-        { 
+        {
           cancelEl: '.bbm-button'
           template: _.template(html)
         }
