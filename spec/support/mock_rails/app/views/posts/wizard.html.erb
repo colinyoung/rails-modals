@@ -1,0 +1,13 @@
+<%= form_for @post do %>
+  <div data-modal-step>
+    <p>Step 1</p>
+    <%= f.label :title %><br />
+    <%= f.text_field :title %>
+  </div>
+
+  <div data-modal-step>
+    <p>Step 2</p>
+    <%= f.label :content %><br />
+    <%= f.text_field :content %>
+  </div>
+<%- end %>

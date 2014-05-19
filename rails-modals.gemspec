@@ -20,5 +20,13 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.5"
   spec.add_development_dependency "rake"
+  spec.add_development_dependency "rspec"
+  spec.add_development_dependency "rails"
+  spec.add_development_dependency "sprockets-rails"
+  spec.add_development_dependency "jquery-rails"
+  spec.add_development_dependency "turbolinks"
+  spec.add_development_dependency "capybara"
+  spec.add_development_dependency "poltergeist"
+  spec.add_development_dependency "active_hash"
   spec.add_dependency "railties"
 end

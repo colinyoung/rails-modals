@@ -1,0 +1,7 @@
+<h1>Your posts</h1>
+
+<%= @posts.each do |post| %>
+  <p><%= post.title %></p>
+<%- end %>
+
+<%= link_to_modal "New post", new_post_path %>

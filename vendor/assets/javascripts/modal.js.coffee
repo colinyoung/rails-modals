@@ -23,7 +23,7 @@ $.fn.modal = (action) ->
         url: path
         success: (html) =>
           # Extracts title from the page title itself.
-          title = html.match(/<title>(.*)<\/title>/)[1]
+          title = $.trim html.match(/<title>((?:.|[\r\n])+)<\/title>/)[1]
           # Content is the first form it finds.
           # Add separate pages to forms like <div modal-step>...</div>
           page = $(html)
@@ -48,7 +48,7 @@ $.fn.modal = (action) ->
 
     when 'show'
       req = modals[path]
-      if req.readyState isnt 4
+      if req? and req.readyState isnt 4
         $(this).tempText 'One sec...'
         waits[path] = this
 

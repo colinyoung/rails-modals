@@ -20,6 +20,10 @@ Then add the following requires to your `application.js` and `application.css` f
 
 ## Usage
 
+Add the following to the end of your layouts (this example is for ERB):
+
+    <%= modals if modals? %>
+
 Change all your links that you want to link to a modal to the following:
 
     link_to ... => link_to_modal ...

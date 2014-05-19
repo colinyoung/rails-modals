@@ -1,0 +1,15 @@
+<%- content_for :title do %>
+Create a new post
+<%- end %>
+
+<%= form_for @post, url: posts_path do |f| %>
+  <div>
+    <%= f.label :title %><br />
+    <%= f.text_field :title %>
+  </div>
+
+  <div>
+    <%= f.label :content %><br />
+    <%= f.text_field :content %>
+  </div>
+<%- end %>
