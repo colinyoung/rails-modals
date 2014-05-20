@@ -1,6 +1,7 @@
 require "rails/modals/version"
-require "rails/modals/engine" if ::Rails.version >= '3.1'
-require "rails/modals/railtie" if defined?(Rails)
+raise "rails-modals, not shockingly, requires rails." unless defined?(Rails)
+require "rails/modals/engine"
+require "rails/modals/railtie"
 
 module Rails
   module Modals

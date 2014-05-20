@@ -62,9 +62,11 @@ $.fn.modal = (action) ->
       steps = $(form).find('*[data-modal-step]')
 
       modalOptions = if steps.length > 0
+
         views = {}
         $(steps).each (i, el) ->
           _modal = $(modal).clone()
+          $(el).attr('data-modal-step', i)
 
           # replace top bar buttons with relevant buttons
           topBar = $(_modal).find('.bbm-modal__topbar')
@@ -87,7 +89,7 @@ $.fn.modal = (action) ->
             $(bottomBar).find('.next').html(label).show().addClass('submit')
             $(submit).hide()
 
-          views["step#{i}"] = { view: _.template($(_modal).html()) }
+          views["step#{i}"] = view: _.template($(_modal).html())
 
         # split steps into views
         {
@@ -100,11 +102,30 @@ $.fn.modal = (action) ->
             'click .next': 'nextStep'
 
           previousStep: (e) ->
-            e.preventDefault();
+            e.preventDefault()
             @previous()
 
+            # apply all new input changes to each input in modal from existing form
+            # We have to poll, unfortunately, until the view is animated in.
+            interval = setInterval(=>
+              oldStep = $(@el).find('*[data-modal-step]')
+              displayingIndex = parseInt $(oldStep).attr('data-modal-step')
+              return unless displayingIndex is @currentIndex # keep waiting
+
+              clearInterval(interval) # we made it, clear the interval
+
+              step = $(form).find('*[data-modal-step]')[@currentIndex]
+              $(oldStep).replaceWith $(step).clone()
+            , 20)
+
           nextStep: (e) ->
-            e.preventDefault();
+            e.preventDefault()
+            
+            # updates invisible form with changes made in this step.
+            section = $(e.target).parents('.modal').find('.bbm-modal__section')
+            step = $(form).find('*[data-modal-step]')[@currentIndex]
+            $(step).replaceWith(section.children('*[data-modal-step]')[0])
+
             @next()
         }
       else
