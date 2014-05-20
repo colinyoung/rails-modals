@@ -57,9 +57,12 @@ $.fn.modal = (action) ->
         return
 
       form = $("form[data-path='#{path}']")
+      steps = $(form).find('*[data-modal-step]')
       modal = $("script[type='text/template'][data-path='#{path}']")
 
-      steps = $(form).find('*[data-modal-step]')
+      # beforesubmit handler
+      beforeSubmit = =>
+        form[0].submit()
 
       modalOptions = if steps.length > 0
 
@@ -86,7 +89,7 @@ $.fn.modal = (action) ->
           if i >= (steps.length - 1)
             submit = $(_modal).find('input[type=submit]')
             label = $(submit).val()
-            $(bottomBar).find('.next').html(label).show().addClass('submit')
+            $(bottomBar).find('.next').html(label).show().addClass('submit').removeClass('next')
             $(submit).hide()
 
           views["step#{i}"] = view: _.template($(_modal).html())
@@ -94,7 +97,7 @@ $.fn.modal = (action) ->
         # split steps into views
         {
           cancelEl: '.cancel'
-          submitEl: '.done'
+          submitEl: '.submit'
           views: views
 
           events:
@@ -127,11 +130,14 @@ $.fn.modal = (action) ->
             $(step).replaceWith(section.children('*[data-modal-step]')[0])
 
             @next()
+
+          beforeSubmit: beforeSubmit
         }
       else
         { 
           cancelEl: '.close'
           template: _.template($(modal).html())
+          beforeSubmit: beforeSubmit
         }
 
       Modal = Backbone.Modal.extend(modalOptions)
