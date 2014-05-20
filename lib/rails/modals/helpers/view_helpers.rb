@@ -13,12 +13,7 @@ module Rails::Modals
 
       text = args.shift unless block_given?
 
-      path = if args.first.is_a? Symbol
-        path_helper = args.shift
-        self.send *[path_helper].concat(args)
-      else
-        args.shift
-      end
+      path = args.shift
 
       queue_modal! path
 
