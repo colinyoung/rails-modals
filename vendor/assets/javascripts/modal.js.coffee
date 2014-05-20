@@ -21,18 +21,22 @@ $.fn.modal = (action, argument) ->
     when 'precache'
       req = $.ajax(
         url: path
+
         success: (html) =>
+          return if $("form[data-path='#{path}']").length > 0 # already loaded
+
           # Extracts title from the page title itself.
-          title = $.trim html.match(/<title>((?:.|[\r\n])+)<\/title>/)[1]
+          title = $.trim html.match(/<title>((?:.|[\r\n])+)<\/title>/)[1] || 'Modal'
           # Content is the first form it finds.
           # Add separate pages to forms like <div modal-step>...</div>
           page = $(html)
           form = $(page).find('form').clone()
           $('body').append(form)
-          $(form).hide().attr('data-path', path)
+          $(form).hide().attr('data-path', path).attr('title', title)
+
           html = _.template $(this).html(),
                             title: title
-                            content: $(page).find('form').html()
+                            content: form.html()
           $(this).html html
 
         error: (response) =>
@@ -40,10 +44,11 @@ $.fn.modal = (action, argument) ->
           html = _.template $(this).html(), title: "Oops!", content: "<p>#{json.error}</p>"
           $(this).html html
 
-        complete: ->
+        complete: (object) =>
           # if this request was clicked while this request was loading,
           # display it now that it's loaded.
           if link = waits[path]
+            delete waits[path]
             $(link).modal('show').originalText()
       )
 
@@ -72,7 +77,7 @@ $.fn.modal = (action, argument) ->
         waits[path] = this
         return this
 
-      form = $("form[data-path='#{path}']")
+      form = $("form[data-path='#{path}']")[0]
       steps = $(form).find('*[data-modal-step]')
       modal = $("script[type='text/template'][data-path='#{path}']")
 
@@ -100,6 +105,9 @@ $.fn.modal = (action, argument) ->
 
           if i >= (steps.length - 1)
             $(_modal).modal('replaceSubmit')
+
+          if $(_modal).html().indexOf('<%=') > 0
+            throw "Template not done"
 
           views["step#{i}"] = view: _.template($(_modal).html())
 
@@ -161,7 +169,7 @@ $.fn.modal = (action, argument) ->
         { 
           cancelEl: '.close'
           submitEl: '.submit'
-          template: _.template($(modal).html())
+          template: -> $(modal).html()
 
           beforeSubmit: ->
             return false if @submitting
@@ -190,5 +198,4 @@ $.fn.modal = (action, argument) ->
       modalView = new Modal()
 
       $('.modal').html(modalView.render().el)
-
   this

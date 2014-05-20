@@ -27,7 +27,7 @@ module Rails::Modals
     end
 
     def queue_modal! path
-      @modals << path
+      @modals << path unless @modals.include? path
     end
 
     def modals
