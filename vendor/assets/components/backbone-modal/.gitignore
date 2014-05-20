@@ -1,0 +1,5 @@
+*
+!.gitignore
+!backbone.modal.js
+!backbone.modal.css
+!backbone.modal.theme.css
