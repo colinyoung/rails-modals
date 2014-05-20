@@ -49,6 +49,13 @@ $.fn.modal = (action) ->
 
       modals[path] = req
 
+    when 'replaceSubmit'
+      submit = $(this).find('input[type=submit]')
+      label = $(submit).val()
+      bottomBar = $(this).find('.bbm-modal__bottombar')
+      $(bottomBar).find('.next').html(label).show().addClass('submit').removeClass('next')
+      $(submit).hide()
+
     when 'show'
       req = modals[path]
       if req? and req.readyState isnt 4
@@ -87,10 +94,7 @@ $.fn.modal = (action) ->
           $(bottomBar).find('.previous').show() unless i is 0
 
           if i >= (steps.length - 1)
-            submit = $(_modal).find('input[type=submit]')
-            label = $(submit).val()
-            $(bottomBar).find('.next').html(label).show().addClass('submit').removeClass('next')
-            $(submit).hide()
+            $(_modal).modal('replaceSubmit')
 
           views["step#{i}"] = view: _.template($(_modal).html())
 
@@ -136,8 +140,11 @@ $.fn.modal = (action) ->
       else
         { 
           cancelEl: '.close'
+          submitEl: '.submit'
           template: _.template($(modal).html())
           beforeSubmit: beforeSubmit
+          onRender: ->
+            $(this.el).modal('replaceSubmit')
         }
 
       Modal = Backbone.Modal.extend(modalOptions)
