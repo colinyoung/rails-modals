@@ -27,6 +27,9 @@ $.fn.modal = (action) ->
           # Content is the first form it finds.
           # Add separate pages to forms like <div modal-step>...</div>
           page = $(html)
+          form = $(page).find('form').clone()
+          $('body').append(form)
+          $(form).hide().attr('data-path', path)
           html = _.template $(this).html(),
                             title: title
                             content: $(page).find('form').html()
@@ -51,19 +54,63 @@ $.fn.modal = (action) ->
       if req? and req.readyState isnt 4
         $(this).tempText 'One sec...'
         waits[path] = this
+        return
 
-      script = $("script[type='text/template'][data-path='#{path}']")
+      form = $("form[data-path='#{path}']")
+      modal = $("script[type='text/template'][data-path='#{path}']")
 
-      html = $(script).html()
+      steps = $(form).find('*[data-modal-step]')
 
-      modalOptions = if $(html).find('*[modal-step]').length
+      modalOptions = if steps.length > 0
+        views = {}
+        $(steps).each (i, el) ->
+          _modal = $(modal).clone()
+
+          # replace top bar buttons with relevant buttons
+          topBar = $(_modal).find('.bbm-modal__topbar')
+          $(topBar).find('.cancel').show()
+
+          # replace section with this step
+          section = $(_modal).find('.bbm-modal__section')
+          $(section).html($(el).clone())
+
+          # replace buttons with relevant buttons
+          bottomBar = $(_modal).find('.bbm-modal__bottombar')
+          $(bottomBar).find('.close').hide()
+          
+          $(bottomBar).find('.next').show()
+          $(bottomBar).find('.previous').show() unless i is 0
+
+          if i >= (steps.length - 1)
+            submit = $(_modal).find('input[type=submit]')
+            label = $(submit).val()
+            $(bottomBar).find('.next').html(label).show().addClass('submit')
+            $(submit).hide()
+
+          views["step#{i}"] = { view: _.template($(_modal).html()) }
+
         # split steps into views
-        # -- pending
-        {}
+        {
+          cancelEl: '.cancel'
+          submitEl: '.done'
+          views: views
+
+          events:
+            'click .previous': 'previousStep'
+            'click .next': 'nextStep'
+
+          previousStep: (e) ->
+            e.preventDefault();
+            @previous()
+
+          nextStep: (e) ->
+            e.preventDefault();
+            @next()
+        }
       else
         { 
-          cancelEl: '.bbm-button'
-          template: _.template(html)
+          cancelEl: '.close'
+          template: _.template($(modal).html())
         }
 
       Modal = Backbone.Modal.extend(modalOptions)
