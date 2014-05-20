@@ -70,7 +70,7 @@ $.fn.modal = (action, argument) ->
       if req? and req.readyState isnt 4
         $(this).tempText 'One sec...'
         waits[path] = this
-        return
+        return this
 
       form = $("form[data-path='#{path}']")
       steps = $(form).find('*[data-modal-step]')
