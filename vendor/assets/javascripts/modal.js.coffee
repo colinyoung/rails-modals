@@ -14,7 +14,7 @@ $ ->
     
     return false
 
-$.fn.modal = (action) ->
+$.fn.modal = (action, argument) ->
   section = ".bbm-modal__section"
   path = $(this).attr('data-path')
   switch action
@@ -53,8 +53,17 @@ $.fn.modal = (action) ->
       submit = $(this).find('input[type=submit]')
       label = $(submit).val()
       bottomBar = $(this).find('.bbm-modal__bottombar')
-      $(bottomBar).find('.next').html(label).show().addClass('submit').removeClass('next')
+      $(bottomBar).find('.next').html(label)
+                                .show()
+                                .addClass('submit')
+                                .removeClass('next')
       $(submit).hide()
+
+    when 'setDisplay'
+      if argument is 'submitting'
+        $(this).find('.bbm-button').css('opacity', 0.5)
+        # clone submit to remove click handlers
+        submit = $(this).find('.submit').text('Submitting...').css('opacity', 1.0)
 
     when 'show'
       req = modals[path]
@@ -66,10 +75,6 @@ $.fn.modal = (action) ->
       form = $("form[data-path='#{path}']")
       steps = $(form).find('*[data-modal-step]')
       modal = $("script[type='text/template'][data-path='#{path}']")
-
-      # beforesubmit handler
-      beforeSubmit = =>
-        form[0].submit()
 
       modalOptions = if steps.length > 0
 
@@ -125,26 +130,59 @@ $.fn.modal = (action) ->
               $(oldStep).replaceWith $(step).clone()
             , 20)
 
-          nextStep: (e) ->
-            e.preventDefault()
+          nextStep: (e, options) ->
+            target = if e
+              e.preventDefault()
+              target = e.target
+            else
+              this.el
             
             # updates invisible form with changes made in this step.
-            section = $(e.target).parents('.modal').find('.bbm-modal__section')
+            section = $(target).parents('.modal').find('.bbm-modal__section')
             step = $(form).find('*[data-modal-step]')[@currentIndex]
-            $(step).replaceWith(section.children('*[data-modal-step]')[0])
+            newStep = section.children('*[data-modal-step]')[0]
+            newStep = $(newStep).clone() if options? and options.clone
+            $(step).replaceWith(newStep)
 
             @next()
 
-          beforeSubmit: beforeSubmit
+          beforeSubmit: ->
+            return false if @submitting
+            @submitting = true # block further submits
+
+            @nextStep(null, clone: true)
+            $(this.el).modal('setDisplay', 'submitting')
+            form[0].submit()
+            return false # to block disappearance
+
+          beforeCancel: -> !@submitting
         }
       else
         { 
           cancelEl: '.close'
           submitEl: '.submit'
           template: _.template($(modal).html())
-          beforeSubmit: beforeSubmit
+
+          beforeSubmit: ->
+            return false if @submitting
+            @submitting = true # block further submits
+
+            # replace innerHTML of invisible form with fields inside the modal
+            $(form).empty()
+            section = $(this.el).find('.bbm-modal__section').clone()
+            $(form).append(section)
+
+            # display changes when submitting
+            $(this.el).modal('setDisplay', 'submitting')
+
+            # submit form
+            form[0].submit()
+            return false # to block disappearance
+
           onRender: ->
             $(this.el).modal('replaceSubmit')
+
+          beforeCancel: -> !@submitting
         }
 
       Modal = Backbone.Modal.extend(modalOptions)
