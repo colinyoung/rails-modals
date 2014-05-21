@@ -1,6 +1,11 @@
 modals = {}
 waits = {}
 
+copySelectedOptions = (from, to) ->
+  $(from).find('select option:selected').each ->
+    selectTag = $(this).parents('select')[0]
+    $(to).find("select[name='#{$(selectTag).attr('name')}']").find("option[value='#{$(this).val()}']").attr("selected", "selected")
+
 $ ->  
 
   $('script[data-path]').each ->
@@ -152,6 +157,9 @@ $.fn.modal = (action, argument) ->
             newStep = $(newStep).clone() if options? and options.clone
             $(step).replaceWith(newStep)
 
+            # copy selected option tags (they won't persisted selected state when cloned)
+            copySelectedOptions(section, newStep)
+
             @next()
 
           beforeSubmit: ->
@@ -160,6 +168,7 @@ $.fn.modal = (action, argument) ->
 
             @nextStep(null, clone: true)
             $(this.el).modal('setDisplay', 'submitting')
+
             form.submit()
             return false # to block disappearance
 
@@ -179,6 +188,9 @@ $.fn.modal = (action, argument) ->
             $(form).empty()
             section = $(this.el).find('.bbm-modal__section').clone()
             $(form).append(section)
+
+            # copy selected option tags (they won't persisted selected state when cloned)
+            copySelectedOptions(this.el, form)
 
             # display changes when submitting
             $(this.el).modal('setDisplay', 'submitting')
