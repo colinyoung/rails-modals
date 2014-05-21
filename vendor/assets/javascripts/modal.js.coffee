@@ -160,7 +160,7 @@ $.fn.modal = (action, argument) ->
 
             @nextStep(null, clone: true)
             $(this.el).modal('setDisplay', 'submitting')
-            form[0].submit()
+            form.submit()
             return false # to block disappearance
 
           beforeCancel: -> !@submitting
@@ -184,7 +184,7 @@ $.fn.modal = (action, argument) ->
             $(this.el).modal('setDisplay', 'submitting')
 
             # submit form
-            form[0].submit()
+            form.submit()
             return false # to block disappearance
 
           onRender: ->
