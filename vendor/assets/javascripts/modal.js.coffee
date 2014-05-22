@@ -82,6 +82,8 @@ $.fn.modal = (action, argument) ->
         waits[path] = this
         return this
 
+      $(document).trigger 'modal:show'
+
       form = $("form[data-path='#{path}']")[0]
       steps = $(form).find('*[data-modal-step]')
       modal = $("script[type='text/template'][data-path='#{path}']")
