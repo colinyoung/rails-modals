@@ -83,7 +83,7 @@ $.fn.modal = (action, argument) ->
         return this
 
       $(document).trigger 'modal:show'
-      $(document).trigger 'modal:page'
+      setTimeout((-> $(document).trigger('modal:page')), 400)
 
       form = $("form[data-path='#{path}']")[0]
       steps = $(form).find('*[data-modal-step]')
@@ -132,7 +132,8 @@ $.fn.modal = (action, argument) ->
           previousStep: (e) ->
             e.preventDefault()
             @previous()
-            $(document).trigger 'modal:page'
+            
+            setTimeout((-> $(document).trigger('modal:page')), 400)
 
             # apply all new input changes to each input in modal from existing form
             # We have to poll, unfortunately, until the view is animated in.
@@ -166,7 +167,7 @@ $.fn.modal = (action, argument) ->
 
             @next()
 
-            $(document).trigger 'modal:page'
+            setTimeout((-> $(document).trigger('modal:page')), 400)
 
           beforeSubmit: ->
             return false if @submitting
