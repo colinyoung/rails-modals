@@ -83,6 +83,7 @@ $.fn.modal = (action, argument) ->
         return this
 
       $(document).trigger 'modal:show'
+      $(document).trigger 'modal:page'
 
       form = $("form[data-path='#{path}']")[0]
       steps = $(form).find('*[data-modal-step]')
@@ -131,6 +132,7 @@ $.fn.modal = (action, argument) ->
           previousStep: (e) ->
             e.preventDefault()
             @previous()
+            $(document).trigger 'modal:page'
 
             # apply all new input changes to each input in modal from existing form
             # We have to poll, unfortunately, until the view is animated in.
@@ -163,6 +165,8 @@ $.fn.modal = (action, argument) ->
             copySelectedOptions(section, newStep)
 
             @next()
+
+            $(document).trigger 'modal:page'
 
           beforeSubmit: ->
             return false if @submitting
