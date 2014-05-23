@@ -31,7 +31,9 @@ $.fn.modal = (action, argument) ->
           return if $("form[data-path='#{path}']").length > 0 # already loaded
 
           # Extracts title from the page title itself.
-          title = $.trim html.match(/<title>((?:.|[\r\n])+)<\/title>/)[1] || 'Modal'
+          title = html.match(/<title>((?:.|[\r\n])+)<\/title>/)[1] || 'Modal'
+          title = title.replace(/(?:\||::|>).*$/, '') # replace common title separators like "Contact Us | My Site Name"
+          title = $.trim title
           # Content is the first form it finds.
           # Add separate pages to forms like <div modal-step>...</div>
           page = $(html)
