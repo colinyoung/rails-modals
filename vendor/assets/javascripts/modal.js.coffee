@@ -47,7 +47,10 @@ $.fn.modal = (action, argument) ->
           $(this).html html
 
         error: (response) =>
-          json = JSON.parse response.responseText
+          try
+            json = JSON.parse response.responseText
+          catch e
+            json = { error: "We're sorry, there was an error." }
           html = _.template $(this).html(), title: "Oops!", content: "<p>#{json.error}</p>"
           $(this).html html
 
