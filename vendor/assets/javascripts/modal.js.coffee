@@ -66,7 +66,7 @@ $.fn.modal = (action, argument) ->
       label = $(submit).val()
       bottomBar = $(this).find('.bbm-modal__bottombar')
       $(bottomBar).find('.next').html(label)
-                                .show()
+                                .css('display', '')
                                 .addClass('submit')
                                 .removeClass('next')
       $(submit).hide()
