@@ -19,6 +19,12 @@ $ ->
     
     return false
 
+  if (hash = window.location.hash).length > 0
+    hash = hash.replace(/^#/, '')
+    link = $("a[data-open-modal][href='#{hash}']")
+    if link[0]
+      $(link[0]).modal('show')
+
 $.fn.modal = (action, argument) ->
   section = ".bbm-modal__section"
   path = $(this).attr('data-path')
