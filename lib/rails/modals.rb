@@ -5,5 +5,6 @@ require "rails/modals/railtie"
 
 module Rails
   module Modals
+    mattr_accessor :remote
   end
 end

@@ -1,10 +1,22 @@
 modals = {}
 waits = {}
 
+# generic function to copy the selected state of some <select> html, which doesn't persist in a jquery clone
 copySelectedOptions = (from, to) ->
   $(from).find('select option:selected').each ->
     selectTag = $(this).parents('select')[0]
     $(to).find("select[name='#{$(selectTag).attr('name')}']").find("option[value='#{$(this).val()}']").attr("selected", "selected")
+
+# Calls a function when the modal is ready for display (or another page is displayed)
+onDisplay = (func) ->
+  addHTML = setInterval(
+    =>
+      section = $('.modal .bbm-modal__section')
+      return unless $(section).innerHeight() > 0 and $(section).is(":visible")
+      func.call(this)
+      clearInterval(addHTML)
+    , 20
+  )
 
 $ ->  
 
@@ -25,7 +37,7 @@ $ ->
     if link[0]
       $(link[0]).modal('show')
 
-$.fn.modal = (action, argument) ->
+$.fn.modal = (action, argument, message) ->
   section = ".bbm-modal__section"
   path = $(this).attr('data-path')
   switch action
@@ -44,6 +56,7 @@ $.fn.modal = (action, argument) ->
           # Add separate pages to forms like <div modal-step>...</div>
           page = $(html)
           form = $(page).find('form').clone()
+          $(form).attr('data-remote', true) if $(this).attr('data-remote-modal') is "true"
           $('body').append(form)
           $(form).hide().attr('data-path', path).attr('title', title)
 
@@ -84,7 +97,19 @@ $.fn.modal = (action, argument) ->
       if argument is 'submitting'
         $(this).find('.bbm-button').css('opacity', 0.5)
         # clone submit to remove click handlers
-        submit = $(this).find('.submit').text('Submitting...').css('opacity', 1.0)
+        submit = $(this).find('.submit').addClass('disabled').tempText('Submitting...')
+
+    when 'error'
+      $('.modal').addClass('modal-error')
+      $('.modal').find('.submit').originalText()
+
+      # go to the step number sent as argument
+      modalView = this[0]
+      viewObj = modalView.views["step#{argument}"]
+      modalView.triggerView(data: viewObj)
+
+      # add HTML
+      onDisplay(-> $('.bbm-modal__section').prepend(message))
 
     when 'show'
       req = modals[path]
@@ -94,9 +119,11 @@ $.fn.modal = (action, argument) ->
         return this
 
       $(document).trigger 'modal:show'
-      setTimeout((-> $(document).trigger('modal:page')), 400)
+      onDisplay(-> $(document).trigger('modal:page'))
 
-      form = $("form[data-path='#{path}']")[0]
+      form = $("form[data-path='#{path}']")[0] # only take the first form matching the path
+      form = $([form]) # wrap form again so that we can call .submit() for jquery-ujs and other jquery event listeners on 'submit'
+
       steps = $(form).find('*[data-modal-step]')
       modal = $("script[type='text/template'][data-path='#{path}']")
 
@@ -144,7 +171,7 @@ $.fn.modal = (action, argument) ->
             e.preventDefault()
             @previous()
             
-            setTimeout((-> $(document).trigger('modal:page')), 400)
+            onDisplay(-> $(document).trigger('modal:page'))
 
             # apply all new input changes to each input in modal from existing form
             # We have to poll, unfortunately, until the view is animated in.
@@ -178,7 +205,7 @@ $.fn.modal = (action, argument) ->
 
             @next()
 
-            setTimeout((-> $(document).trigger('modal:page')), 400)
+            onDisplay(-> $(document).trigger('modal:page'))
 
           beforeSubmit: ->
             return false if @submitting
@@ -188,6 +215,7 @@ $.fn.modal = (action, argument) ->
             $(this.el).modal('setDisplay', 'submitting')
 
             form.submit()
+            @submitting = false
             return false # to block disappearance
 
           beforeCancel: -> !@submitting
@@ -226,6 +254,41 @@ $.fn.modal = (action, argument) ->
       Modal = Backbone.Modal.extend(modalOptions)
 
       modalView = new Modal()
+
+      # bind submit events because this is a remote form
+      if $(form).attr('data-remote')
+
+        $(form).bind 'ajax:complete', ->
+          $('.bbm-modal').empty() # so that pages are re-rendered
+
+        $(form).bind 'ajax:success', (jqueryEvent, responseText, textStatus, xhr) =>
+          if responseText.match(/[0-9]+ errors? prohibited this [a-z ]+ from being saved/)
+            errors = $(responseText).find("#error_explanation")
+            return $(modalView).modal('error', 0, errors)
+
+          successPath = if responseText.indexOf['{'] is 0
+            JSON.parse(responseText)['success_path']
+          else
+            xhr.getResponseHeader('X-Success-Path')
+
+          if successPath
+            window.location.href = successPath
+          else
+            window.location.reload()
+
+        $(form).bind 'ajax:error', (xhr, status, error) ->
+          responseText = xhr.responseText
+          errors = $('<div id="error_explanation"><p>There was an error.</p></div>')
+          if responseText.indexOf['{'] is 0
+            errorObj = JSON.parse(responseText)['error']
+            ul = $('<ul>')
+            if _.isArray(errorObj)
+              $(errorObj).each -> $(ul).append("<li>#{this}</li>")
+            else
+              $(ul).append("<li>#{errorObj}</li>")
+            $(errors).append(ul)
+          
+          $(modalView).modal('error', 0, errors.html())
 
       $('.modal').html(modalView.render().el)
   this

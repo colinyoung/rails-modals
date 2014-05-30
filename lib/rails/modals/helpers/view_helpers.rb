@@ -2,7 +2,7 @@ module Rails::Modals
   module ViewHelpers
 
     def setup_modals
-      @modals ||= []
+      @modals ||= {}
     end
 
     def link_to_modal *args, &block
@@ -15,7 +15,7 @@ module Rails::Modals
 
       path = args.shift
 
-      queue_modal! path
+      queue_modal! path, options
 
       options["data-path"] ||= path
 
@@ -26,13 +26,15 @@ module Rails::Modals
       end
     end
 
-    def queue_modal! path
-      @modals << path unless @modals.include? path
+    def queue_modal! path, options
+      @modals[path] = options unless @modals.has_key? path
     end
 
     def modals
-      scripts = @modals.collect do |modal|
-        content_tag :script, type: "text/template", :"data-path" => modal do
+      scripts = @modals.collect do |path, options|
+        attributes = { type: "text/template", :"data-path" => path }
+        attributes[:"data-remote-modal"] = true if options[:remote]
+        content_tag :script, attributes do
           raw <<-RAW
             <div class="bbm-modal__topbar">
               <h3 class="bbm-modal__title"><%= title %></h3>
