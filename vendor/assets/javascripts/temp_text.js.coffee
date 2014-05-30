@@ -3,11 +3,16 @@ $.fn.tempText = (text) ->
   tempText = $(this).attr('data-temp-text')
   return if tempText? and tempText.length > 0
   original = $(this).text()
-  return if original.length == 0
+  if $.trim(original) == $(this).find('i.fa span').text() # ignore text labels in <i> tags
+    return $(this).attr('data-temp-html', $(this).html()).html('<i class="fa fa-spin fa-spinner"></i>')
+  return if original.length == 0 # return if there's no text
   $(this).text(text)
          .attr('data-temp-text', original)
 
 $.fn.originalText = ->
-  original = $(this).attr('data-temp-text')
-  $(this).removeAttr('data-temp-text')
-         .text(original)
+  if original = $(this).attr('data-temp-html')
+    $(this).removeAttr('data-temp-html').html(original)
+  else
+    original = $(this).attr('data-temp-text')
+    $(this).removeAttr('data-temp-text')
+           .text(original)
