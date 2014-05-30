@@ -3,6 +3,7 @@ $.fn.tempText = (text) ->
   tempText = $(this).attr('data-temp-text')
   return if tempText? and tempText.length > 0
   original = $(this).text()
+  return if original.length == 0
   $(this).text(text)
          .attr('data-temp-text', original)
 
