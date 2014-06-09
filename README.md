@@ -122,6 +122,11 @@ You can also simply return JSON of the format:
 { "error": ["My error message 1", "My error message 2"] }
 ```
 
+## Events
+
+`modal:show` when the modal first opens (modal HTML may not be loaded)
+`modal:page` when a new modal page is displayed (HTML is loaded)
+
 ## Contributing
 
 1. Fork it ( http://github.com/<my-github-username>/rails-modals/fork )
