@@ -1,5 +1,22 @@
 modals = {}
 waits = {}
+validationsUnsupported = typeof $('<input>')[0].checkValidity isnt "function"
+
+_validate = (item) ->
+  section = $(item.el).find('.bbm-modal__section')
+  unless validationsUnsupported or _.every(section.find('input'), (i) -> i.validity.valid)
+    section.find('span.error').remove()
+    section.find('input').each ->
+      if !this.validity.valid
+        message = this.title || this.validationMessage
+        name = $(this).attr('name')
+        field = $(section).find("input[name='#{name}']")
+        errorSpan = $("<p class='error'>#{message}</p>")
+        $(field).addClass('invalid').after errorSpan
+        $(field).one 'keyup', -> $(this).siblings(".error").remove()
+    return false
+
+  true
 
 # generic function to copy the selected state of some <select> html, which doesn't persist in a jquery clone
 copySelectedOptions = (from, to) ->
@@ -208,13 +225,14 @@ $.fn.modal = (action, argument, message) ->
             onDisplay(-> $(document).trigger('modal:page'))
 
           beforeSubmit: ->
-            return false if @submitting
+            return false if @submitting or !_validate(this)
+
             @submitting = true # block further submits
 
             @nextStep(null, clone: true)
             $(this.el).modal('setDisplay', 'submitting')
 
-            form.submit()
+            form.submit() if form[0].checkValidity()
             @submitting = false
             return false # to block disappearance
 
@@ -227,7 +245,8 @@ $.fn.modal = (action, argument, message) ->
           template: -> $(modal).html()
 
           beforeSubmit: ->
-            return false if @submitting
+            return false if @submitting or !_validate(this)
+
             @submitting = true # block further submits
 
             # replace innerHTML of invisible form with fields inside the modal
@@ -241,8 +260,8 @@ $.fn.modal = (action, argument, message) ->
             # display changes when submitting
             $(this.el).modal('setDisplay', 'submitting')
 
-            # submit form
             form.submit()
+
             return false # to block disappearance
 
           onRender: ->
