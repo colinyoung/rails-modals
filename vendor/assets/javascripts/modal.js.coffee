@@ -13,7 +13,7 @@ _validate = (item) ->
         field = $(section).find("input[name='#{name}']")
         errorSpan = $("<p class='error'>#{message}</p>")
         $(field).addClass('invalid').after errorSpan
-        ['keyup', 'change'].each ->
+        ['keyup', 'change', 'blur'].each ->
           $(field).one this, -> $(this).siblings(".error").remove()
         
     return false
