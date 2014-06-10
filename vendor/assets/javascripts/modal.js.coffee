@@ -4,6 +4,7 @@ validationsUnsupported = typeof $('<input>')[0].checkValidity isnt "function"
 
 _validate = (item) ->
   section = $(item.el).find('.bbm-modal__section')
+  $(item.el).find('p.error').remove()
   unless validationsUnsupported or _.every(section.find('input'), (i) -> i.validity.valid)
     section.find('span.error').remove()
     section.find('input').each ->
@@ -13,8 +14,9 @@ _validate = (item) ->
         field = $(section).find("input[name='#{name}']")
         errorSpan = $("<p class='error'>#{message}</p>")
         $(field).addClass('invalid').after errorSpan
-        ['keyup', 'change', 'blur'].each ->
-          $(field).one this, -> $(this).siblings(".error").remove()
+        $(['keyup', 'change', 'blur']).each (i, event) ->
+          $(field).on event, ->
+            $(this).siblings(".error").remove()
         
     return false
 
