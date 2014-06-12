@@ -147,12 +147,15 @@ $.fn.modal = (action, argument, message) ->
       onDisplay(-> $(document).trigger('modal:page'))
 
       form = $("form[data-path='#{path}']")[0] # only take the first form matching the path
-      form = $([form]) # wrap form again so that we can call .submit() for jquery-ujs and other jquery event listeners on 'submit'
 
-      steps = $(form).find('*[data-modal-step]')
+      if form?
+        form = $([form]) # wrap form again so that we can call .submit() for jquery-ujs and other jquery event listeners on 'submit'
+
+        steps = $(form).find('*[data-modal-step]')
+      
       modal = $("script[type='text/template'][data-path='#{path}']")
 
-      modalOptions = if steps.length > 0
+      modalOptions = if steps? and steps.length > 0
 
         views = {}
         $(steps).each (i, el) ->
@@ -273,7 +276,11 @@ $.fn.modal = (action, argument, message) ->
             return false # to block disappearance
 
           onRender: ->
-            $(this.el).modal('replaceSubmit')
+            if form
+              $(this.el).modal('replaceSubmit')
+            else
+              $(this.el).find(".submit").hide()
+              $(this.el).find(".close").addClass('alone')
 
           beforeCancel: -> !@submitting
         }
@@ -283,7 +290,7 @@ $.fn.modal = (action, argument, message) ->
       modalView = new Modal()
 
       # bind submit events because this is a remote form
-      if $(form).attr('data-remote')
+      if form? and $(form).attr('data-remote')
 
         $(form).bind 'ajax:complete', ->
           $('.bbm-modal').empty() # so that pages are re-rendered
