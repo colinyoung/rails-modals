@@ -32,6 +32,11 @@ copySelectedOptions = (from, to) ->
     selectTag = $(this).parents('select')[0]
     $(to).find("select[name='#{$(selectTag).attr('name')}']").find("option[value='#{$(this).val()}']").attr("selected", "selected")
 
+replaceFileFields = (from, to) ->
+  $(from).find("input[type=file]").each (i, inputFrom) ->
+    target = $(to).find("input[type=file][name='#{$(inputFrom).attr('name')}']")
+    target.replaceWith(inputFrom)
+
 # Calls a function when the modal is ready for display (or another page is displayed)
 onDisplay = (func) ->
   addHTML = setInterval(
@@ -230,6 +235,7 @@ $.fn.modal = (action, argument, message) ->
 
             # copy selected option tags (they won't persisted selected state when cloned)
             copySelectedOptions(section, newStep)
+            replaceFileFields(section, newStep)
 
             @next()
 
@@ -267,6 +273,7 @@ $.fn.modal = (action, argument, message) ->
 
             # copy selected option tags (they won't persisted selected state when cloned)
             copySelectedOptions(this.el, form)
+            replaceFileFields(this.el, form)
 
             # display changes when submitting
             $(this.el).modal('setDisplay', 'submitting')
