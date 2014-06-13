@@ -325,4 +325,8 @@ $.fn.modal = (action, argument, message) ->
           $(modalView).modal('error', 0, errors.html())
 
       $('.modal').html(modalView.render().el)
+
+      title = $('.modal').find('.bbm-modal__title').text()
+      $('.modal').attr('data-path', path)
+                 .attr('data-title', title)
   this
