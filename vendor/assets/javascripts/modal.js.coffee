@@ -249,7 +249,7 @@ $.fn.modal = (action, argument, message) ->
             @nextStep(null, clone: true)
             $(this.el).modal('setDisplay', 'submitting')
 
-            form.submit() if $(this).find('.submit')[0]
+            form.submit() if $(this.el).find('.submit')[0]
             @submitting = false
             return false # to block disappearance
 
