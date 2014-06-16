@@ -50,8 +50,6 @@ onDisplay = (func) ->
 
 $ ->  
 
-  console.log 'modals'
-
   $('script[data-path]').each ->
     $(this).modal 'precache'
 
