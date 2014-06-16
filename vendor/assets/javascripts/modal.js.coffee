@@ -53,7 +53,7 @@ $ ->
   $('script[data-path]').each ->
     $(this).modal 'precache'
 
-  $('*[data-open-modal]').on 'click', (e) ->
+  $(document.body).on 'click', '*[data-open-modal]', (e) ->
     e.preventDefault()
     e.stopPropagation()
 
