@@ -34,7 +34,7 @@ module Rails::Modals
       scripts = @modals.collect do |path, options|
         attributes = { type: "text/template", :"data-path" => path }
         attributes[:"data-remote-modal"] = true if options[:remote]
-        content_tag :script, attributes, ""
+        content_tag :script, attributes do; end
       end
 
       raw scripts.join("\n")
