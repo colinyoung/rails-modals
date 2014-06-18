@@ -355,3 +355,7 @@ $.fn.modal = (action, argument, message) ->
       $('.modal').attr('data-path', path)
                  .attr('data-title', title)
   this
+
+# compatibility with turbolinks
+$(document).on "page:load", ->
+  modals = {}
