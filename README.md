@@ -32,6 +32,11 @@ That's it! Provided your linked-to pages have forms on them, your forms will pop
 
 Incidentally, the title of the modal window is the same as the `<title>` of your linked-to page.
 
+Options for link_to_modal include:
+
+- `data-precache` => precache the modal (starts loading on page load instead of on user click)
+- `data-display-loading` => when the modal is being loaded, show temporary warning text.
+
 ## Optimizing your controllers
 
 The forms are requested over XHR, which must follow all redirects. So if you're in the habit of creating controllers that do this:

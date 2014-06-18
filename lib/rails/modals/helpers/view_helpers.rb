@@ -34,22 +34,7 @@ module Rails::Modals
       scripts = @modals.collect do |path, options|
         attributes = { type: "text/template", :"data-path" => path }
         attributes[:"data-remote-modal"] = true if options[:remote]
-        content_tag :script, attributes do
-          raw <<-RAW
-            <div class="bbm-modal__topbar">
-              <h3 class="bbm-modal__title"><%= title %></h3>
-              <a href="javascript:;" class="bbm-button cancel" style="display: none">&times; Cancel</a>
-            </div>
-            <div class="bbm-modal__section">
-              <%= content %>
-            </div>
-            <div class="bbm-modal__bottombar">
-              <a href="javascript:;" class="bbm-button close">Close</a>
-              <a href="javascript:;" class="bbm-button previous" style="display: none">Previous</a>          
-              <a href="javascript:;" class="bbm-button next" style="display: none">Next</a>
-            </div>
-          RAW
-        end
+        content_tag :script, attributes, ""
       end
 
       raw scripts.join("\n")

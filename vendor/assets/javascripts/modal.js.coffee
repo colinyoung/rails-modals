@@ -1,3 +1,17 @@
+BBM_TEMPLATE = '
+<div class="bbm-modal__topbar">
+  <h3 class="bbm-modal__title"><%= title %></h3>
+  <a href="javascript:;" class="bbm-button cancel" style="display: none">&times; Cancel</a>
+</div>
+<div class="bbm-modal__section">
+  <%= content %>
+</div>
+<div class="bbm-modal__bottombar">
+  <a href="javascript:;" class="bbm-button close">Close</a>
+  <a href="javascript:;" class="bbm-button previous" style="display: none">Previous</a>          
+  <a href="javascript:;" class="bbm-button next" style="display: none">Next</a>
+</div>'
+
 modals = {}
 waits = {}
 validationsUnsupported = typeof $('<input>')[0].checkValidity isnt "function"
@@ -90,7 +104,7 @@ $.fn.modal = (action, argument, message) ->
           $('body').append(form)
           $(form).hide().attr('data-path', path).attr('title', title)
 
-          html = _.template $(this).html(),
+          html = _.template BBM_TEMPLATE,
                             title: title
                             content: form.html()
           $(this).html html
@@ -100,7 +114,7 @@ $.fn.modal = (action, argument, message) ->
             json = JSON.parse response.responseText
           catch e
             json = { error: "We're sorry, there was an error." }
-          html = _.template $(this).html(), title: "Oops!", content: "<p>#{json.error}</p>"
+          html = _.template BBM_TEMPLATE, title: "Oops!", content: "<p>#{json.error}</p>"
           $(this).html html
 
         complete: (object) =>
@@ -148,7 +162,7 @@ $.fn.modal = (action, argument, message) ->
         req = modals[path]
         
       if req? and req.readyState < 4
-        $(this).tempText 'One sec...'
+        $(this).tempText 'One sec...' if $(this).data('displayLoading')
         waits[path] = this
         return this
 
