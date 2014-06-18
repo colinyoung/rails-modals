@@ -51,7 +51,7 @@ onDisplay = (func) ->
 $ ->  
 
   $('script[data-path]').each ->
-    $(this).modal 'precache'
+    $(this).modal 'precache' if $(this).attr("data-precache")
 
   $(document.body).on 'click', '*[data-open-modal]', (e) ->
     e.preventDefault()
@@ -143,7 +143,11 @@ $.fn.modal = (action, argument, message) ->
 
     when 'show'
       req = modals[path]
-      if req? and req.readyState isnt 4
+      unless req
+        $("script[data-path='#{path}']").modal('precache')
+        req = modals[path]
+        
+      if req? and req.readyState < 4
         $(this).tempText 'One sec...'
         waits[path] = this
         return this
