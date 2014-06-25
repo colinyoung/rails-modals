@@ -65,7 +65,7 @@ onDisplay = (func) ->
 $ ->  
 
   $('script[data-path]').each ->
-    $(this).modal 'precache' if $(this).attr("data-precache")
+    $(this).modal 'load' if $(this).attr("data-precache")
 
   $(document.body).on 'click', '*[data-open-modal]', (e) ->
     e.preventDefault()
@@ -85,7 +85,7 @@ $.fn.modal = (action, argument, message) ->
   section = ".bbm-modal__section"
   path = $(this).attr('data-path')
   switch action
-    when 'precache'
+    when 'load'
       req = $.ajax(
         url: path
 
@@ -107,7 +107,7 @@ $.fn.modal = (action, argument, message) ->
           html = _.template BBM_TEMPLATE,
                             title: title
                             content: form.html()
-          $(this).html html
+          $(this).text html
 
         error: (response) =>
           try
@@ -115,7 +115,7 @@ $.fn.modal = (action, argument, message) ->
           catch e
             json = { error: "We're sorry, there was an error." }
           html = _.template BBM_TEMPLATE, title: "Oops!", content: "<p>#{json.error}</p>"
-          $(this).html html
+          $(this).text html
 
         complete: (object) =>
           # if this request was clicked while this request was loading,
@@ -158,7 +158,7 @@ $.fn.modal = (action, argument, message) ->
     when 'show'
       req = modals[path]
       unless req
-        $("script[data-path='#{path}']").modal('precache')
+        $("script[data-path='#{path}']").modal('load')
         req = modals[path]
         
       if req? and req.readyState < 4
@@ -182,7 +182,8 @@ $.fn.modal = (action, argument, message) ->
 
         views = {}
         $(steps).each (i, el) ->
-          _modal = $(modal).clone()
+          _modal = $('<div>')
+          $(_modal).html $(modal).html()
           $(el).attr('data-modal-step', i)
 
           # replace top bar buttons with relevant buttons
@@ -203,8 +204,9 @@ $.fn.modal = (action, argument, message) ->
           if i >= (steps.length - 1)
             $(_modal).modal('replaceSubmit')
 
-          if $(_modal).html().indexOf('<%=') > 0
+          if $(_modal).text().indexOf('<%=') > 0
             throw "Template not done"
+
 
           views["step#{i}"] = view: _.template($(_modal).html())
 
@@ -277,7 +279,7 @@ $.fn.modal = (action, argument, message) ->
         { 
           cancelEl: '.close'
           submitEl: '.submit'
-          template: -> $(modal).html()
+          template: -> $(modal).text()
 
           beforeSubmit: ->
             return false if @submitting or !_validate(this)
