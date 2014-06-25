@@ -207,7 +207,6 @@ $.fn.modal = (action, argument, message) ->
           if $(_modal).text().indexOf('<%=') > 0
             throw "Template not done"
 
-
           views["step#{i}"] = view: _.template($(_modal).html())
 
         # split steps into views
@@ -224,7 +223,10 @@ $.fn.modal = (action, argument, message) ->
             e.preventDefault()
             @previous()
             
-            onDisplay(-> $(document).trigger('modal:page'))
+            onDisplay(=>
+              $(document).trigger('modal:page')
+              $(this.el).find('select').disableEnter()
+            )
 
             # apply all new input changes to each input in modal from existing form
             # We have to poll, unfortunately, until the view is animated in.
@@ -259,7 +261,10 @@ $.fn.modal = (action, argument, message) ->
 
             @next()
 
-            onDisplay(-> $(document).trigger('modal:page'))
+            onDisplay(=>
+              $(document).trigger('modal:page')
+              $(this.el).find('select').disableEnter()
+            )
 
           beforeSubmit: ->
             return false if @submitting or !_validate(this)
@@ -303,6 +308,11 @@ $.fn.modal = (action, argument, message) ->
             return false # to block disappearance
 
           onRender: ->
+            onDisplay(=>
+              $(document).trigger('modal:page')
+              $(this.el).find('select').disableEnter()
+            )
+
             if form
               $(this.el).modal('replaceSubmit')
             else
@@ -361,3 +371,10 @@ $.fn.modal = (action, argument, message) ->
 # compatibility with turbolinks
 $(document).on "page:load", ->
   modals = {}
+
+# disable enter key on <select> boxes from submitting
+$.fn.disableEnter = ->
+  $(this).on 'keyup', (e) ->
+    if e.which is 13
+      e.preventDefault()
+      return false
