@@ -279,7 +279,7 @@ $.fn.modal = (action, argument, message) ->
             return false # to block disappearance
 
           beforeCancel: ->
-            if !@submitting
+            if !@submitting? or @submitting is false
               $(document).trigger('modal:close')
               return true
         }
@@ -323,7 +323,7 @@ $.fn.modal = (action, argument, message) ->
               $(this.el).find(".close").addClass('alone')
 
           beforeCancel: ->
-            if !@submitting
+            if !@submitting? or @submitting is false
               $(document).trigger('modal:close')
               return true
         }
