@@ -278,7 +278,10 @@ $.fn.modal = (action, argument, message) ->
             @submitting = false
             return false # to block disappearance
 
-          beforeCancel: -> !@submitting
+          beforeCancel: ->
+            if !@submitting
+              $(document).trigger('modal:close')
+              return true
         }
       else
         { 
@@ -319,7 +322,10 @@ $.fn.modal = (action, argument, message) ->
               $(this.el).find(".submit").hide()
               $(this.el).find(".close").addClass('alone')
 
-          beforeCancel: -> !@submitting
+          beforeCancel: ->
+            if !@submitting
+              $(document).trigger('modal:close')
+              return true
         }
 
       Modal = Backbone.Modal.extend(modalOptions)
@@ -341,6 +347,8 @@ $.fn.modal = (action, argument, message) ->
             JSON.parse(responseText)['success_path']
           else
             xhr.getResponseHeader('X-Success-Path')
+
+          $(document).trigger('modal:close')
 
           if successPath
             window.location.href = successPath
